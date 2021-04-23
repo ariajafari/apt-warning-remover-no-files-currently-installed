@@ -1,0 +1,11 @@
+#! /bin/bash
+apt-get install vrms --reinstall -y | tee aptoutput.txt
+cat aptoutput.txt | sed 's/Reading database ... /\n/' > rawlist.txt
+awk '/dpkg: warning:/ {print $8}' rawlist.txt | sed 's/^.//;s/.$//' > list.txt
+i=1
+while read line; do
+	echo "$line"
+	apt install $line --reinstall -y
+	i=$((i+1))
+done < list.txt
+rm aptoutput.txt rawlist.txt list.txt
